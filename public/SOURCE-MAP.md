@@ -32,3 +32,5 @@ comparison.html 的五款产品能力已在 2026-10-04 核对官方资料，链�
 产品设计 §4 原竞品速览是历史未复核摘要，本页不沿用其“各自只覆盖一层”的排他断言：Recensa 已覆盖整份文档和来源；Lenz 可处理草稿和引用；Prelint 有后续 PR 评审；Patronus 支持自定义标准。页面不据“未公开”推断“不支持”。Reviewer 的区别写作组合流程，非功能独占或效果优越声明。
 
 选用建议为公开定位加产品范围的归纳；六类任务与示例依据 T0 §1、§3–6，非实际成功案例。未修改 T0、语义合同或插件包。
+
+2026-10-05 架构更新：收集与失败处置见 `plugins/reviewer/lib/collection.mjs`，Codex 证据见 `codex-evidence.mjs`；当前 76 文件候选、工程验证与历史宿主重放见 `docs/tasks/Architecture-collection-evidence-20261005.md` 和 `docs/tasks/Architecture-release-20261005.md`。旧 CP3 与 manifest 仅对应 `51bd9a93…`，不外推至本次候选。

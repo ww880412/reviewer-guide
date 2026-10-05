@@ -19,8 +19,8 @@
 
 这是纯说明网站，不会调用 Reviewer、启动模型、写评审状态、安装插件或发送决定。架构交互和首页报告明确为说明/示意。
 
-没有公开下载 ZIP；release manifest 已生成，绑定已验收的 74 个包文件。不得把“页面完成”写成“插件已发布”。当前日常安装与修复候选不同；状态更新时核对包 digest、Claude 报告、evaluator、manifest 及实际安装，不能只改版本号。
+没有公开下载 ZIP；历史 release manifest 绑定旧候选 74 个包文件，当前架构重构候选为 76 文件，不继承旧 manifest。不得把“页面完成”写成“插件已发布”。本次网站更新未切换日常安装；状态更新时核对包 digest、Claude 报告、evaluator、manifest 及实际安装，不能只改版本号。
 
-仅部署这个目录中的公开页面和静态资源；不要发布本仓其他目录、私人轨迹或材料。2026-10-05 用户指定沿用 Matt 的 GitHub Pages 方式；公开网站仓库为 ww880412/reviewer-guide。仅上传公开静态白名单，插件包和验收原始材料留在私有工程仓。网站不进入 plugins/reviewer 包，避免改变刚验收的74文件候选。要携带包内指南须单独形成新候选并重新核验。
+仅部署这个目录中的公开页面和静态资源；不要发布本仓其他目录、私人轨迹或材料。2026-10-05 用户指定沿用 Matt 的 GitHub Pages 方式；公开网站仓库为 ww880412/reviewer-guide。仅上传公开静态白名单，插件包和验收原始材料留在私有工程仓。网站不进入 plugins/reviewer 包，按独立网站产物发布。要携带包内指南须单独形成新候选并重新核验。
 
-网站初次交付记录见 ../tasks/Reviewer-site-delivery.md；2026-10-05 状态更新与验收收尾见 ../tasks/RV-06-CP3-closeout.md。
+当前架构交付与网站发布记录见工程仓 docs/tasks/Architecture-collection-evidence-20261005.md 和 docs/tasks/Architecture-release-20261005.md；旧 CP3 记录保留为历史依据。

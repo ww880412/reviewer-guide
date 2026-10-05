@@ -50,13 +50,13 @@
 </div>
 <section id="current" class="doc-section">
 <p class="eyebrow">01 / 当前快照 · 2026-10-05</p>
-<h2>0.7.0 修复候选，验收收尾完成。</h2>
+<h2>0.7.0 架构重构，工程验收收尾完成。</h2>
 <div class="release-callout">
-<span class="badge good">CP3 PASS · 有界验收</span>
+<span class="badge good">架构工程 PASS · 宿主记录重放通过</span>
 <h3>Codex · 固定影子模式</h3>
-<p>74 个包文件 · 候选 digest</p>
-<code class="digest">51bd9a9376debb1c7e8f82c17b02a632eaf89511ae08e706e82a37a59aec366e</code>
-<p>修复代码 <code>fecbb6a</code> · 固定补验证据 <code>fc4cfe6</code>
+<p>76 个包文件 · 新源码候选 digest</p>
+<code class="digest">24b43ea4b32ef35ed03555524d30b9de2d860db676d664ca6f741cb7e9417c6c</code>
+<p>集中结果收集与失败处置 · 集中 Codex 宿主证据
 </p>
 </div>
 <div class="table-scroll" role="region" tabindex="0" aria-label="候选验收发布与安装状态">
@@ -70,19 +70,19 @@
 <tbody>
 <tr>
 <th scope="row">源码候选</th>
-<td>D-4 修复与 D-5/D-6 固定补验完成；Claude 对相同候选独立复核 PASS。</td>
+<td>两个架构 module 已落地，产品语义、SDK 与原有重试规则保持不变；独立 Standards / Spec 评审均 PASS。</td>
 </tr>
 <tr>
 <th scope="row">验收收尾</th>
-<td>Claude 原文已提交并绑定，三组核心 evaluator 各 71/71 PASS；CP3 已关闭，仅覆盖本候选的固定 H-synthetic 验收。</td>
+<td>本候选组件检查通过；三组九个历史宿主场景共 39 项重放一致。属于历史记录重放，不是新一轮宿主 E2E 或真人验收。</td>
 </tr>
 <tr>
 <th scope="row">网站与插件分发</th>
-<td>本站为 GitHub Pages 产品说明网站；插件 release manifest 已绑定全部 74 个包文件，插件源码未合并 main 或 push，暂无公开下载包。</td>
+<td>本站为 GitHub Pages 产品说明网站；架构代码与验收记录分别提交，暂无公开插件下载包。旧 release manifest 只绑定先前 74 文件候选，不覆盖本候选。</td>
 </tr>
 <tr>
 <th scope="row">日常安装</th>
-<td>仍为先前 <code>c5be09d2…</code> 包；最新修复 <code>51bd9a93…</code> 未覆盖安装。</td>
+<td>本次网站发布未切换日常安装；使用前应独立核对安装字节，不能仅凭版本号判断。</td>
 </tr>
 <tr>
 <th scope="row">真人体验与普遍效果</th>
@@ -110,7 +110,7 @@
 <p>按材料、标准、来源和依赖计算重查范围，保留历史结果；包括首轮最多三轮，失败与成本均有可见边界。</p>
 </li>
 <li>
-<strong>本轮修复</strong>
+<strong>既有修复</strong>
 <p>退回标准后必须修改重审；成本和证据过期的恢复路径修正；B1 设计语境澄清；最终卡缩为摘要；对齐结果绑定错误纳入已有技术重试。</p>
 </li>
 <li>
@@ -120,8 +120,8 @@
 </ol>
 </section>
 <section id="verification" class="doc-section">
-<p class="eyebrow">03 / 本轮证据</p>
-<h2>组件测试、宿主补验、独立核验。</h2>
+<p class="eyebrow">03 / 分候选证据</p>
+<h2>当前工程验证与历史验收分别记录。</h2>
 <div class="table-scroll" role="region" tabindex="0" aria-label="分层验证证据">
 <table>
 <thead>
@@ -134,33 +134,38 @@
 <tbody>
 <tr>
 <th scope="row">组件与契约</th>
-<td>Node 236/236；工具 60/60；Python 语义守卫 7/7；SDK contracts 106/106（2026-10-05 复跑）</td>
-<td>本次对应组件行为通过；Claude 独立撤销分类补丁后，两条新增测试转为失败。</td>
+<td>当前候选：Node 243/243；工具 60/60；语义守卫 7/7；SDK contracts 106/106；SDK 47 文件完整</td>
+<td>保持原有行为的组件回归通过；独立源码差分 454 项、失败处置 160 项一致。</td>
 </tr>
 <tr>
-<th scope="row">固定宿主补验</th>
-<td>3 组 × 4 案；专用检查 131/131</td>
+<th scope="row">历史宿主记录重放</th>
+<td>当前候选重放 3 组 × 3 案，共 39 项通过</td>
+<td>30 项结果与 9 项用量来源一致；原答复为 H-synthetic，未新建模型运行或真人决定。</td>
+</tr>
+<tr>
+<th scope="row">旧候选固定宿主补验</th>
+<td><code>51bd9a93…</code>：3 组 × 4 案；专用检查 131/131</td>
 <td>12 条路径到达 decided，12 张最终卡首次呈现精确。属于 H-synthetic。</td>
 </tr>
 <tr>
-<th scope="row">语义检查</th>
+<th scope="row">旧候选语义检查</th>
 <td>clean / revised 各 3/3 零 finding；seed / existing 各 3/3 经判官确认</td>
 <td>固定样本中能区分设计选择与现存状态断言，检查预置问题和修改结果。</td>
 </tr>
 <tr>
-<th scope="row">故障恢复</th>
+<th scope="row">旧候选故障恢复</th>
 <td>一次初筛 binding mismatch，原运行 attempt 2 完成</td>
 <td>Loop 2 既有恢复实际走通；D-4 对齐修复的直接证据是公开接口测试与旧 final 原文回放。</td>
 </tr>
 <tr>
-<th scope="row">Claude 独立复核</th>
+<th scope="row">旧候选 Claude 复核</th>
 <td>D-4 / D-5 / D-6 PASS</td>
 <td>核对候选、时序、12 份快照、首呈卡、判官输入及失败计数；不只采信汇总脚本。</td>
 </tr>
 </tbody>
 </table>
 </div>
-<h3>三组结果</h3>
+<h3>旧候选三组结果</h3>
 <div class="table-scroll" role="region" tabindex="0" aria-label="固定三组发现数量">
 <table>
 <thead>
@@ -221,23 +226,23 @@
 <h2>验收记录先闭合，再处理分发。</h2>
 <ol class="steps">
 <li>
-<strong>已完成：绑定 Claude 复核</strong>
+<strong>历史完成：旧候选 Claude 复核</strong>
 <p>原始记录已提交，以准确 digest 和报告 hash 绑定三组 evaluator；三组均为 71/71。</p>
 </li>
 <li>
-<strong>已完成：CP3 与发布清单</strong>
+<strong>历史完成：旧候选 CP3 与发布清单</strong>
 <p>旧候选和失败证据保留；release manifest 已绑定 74 个实际包文件，工程检查复跑通过。</p>
 </li>
 <li>
-<strong>后续：插件分发与日常安装</strong>
-<p>插件源码合并、push、下载包分发和覆盖安装分别记录；网站上线不代表这些动作已发生。</p>
+<strong>当前完成：架构工程验收与网站更新</strong>
+<p>本次发布说明站；新候选的全新宿主 E2E、插件下载包与日常安装切换仍单独办理。</p>
 </li>
 </ol>
 </section>
 <section id="sources" class="doc-section">
 <p class="eyebrow">06 / 内容依据</p>
 <h2>可从仓库追溯的维护入口。</h2>
-<p>页面以当前工程实现、已确认产品语义和最新 Claude 复核交叉核对。以下为仓库相对路径；本地预览只提供站点文件，不直接暴露评审轨迹或整个仓库。</p>
+<p>页面以当前工程实现、已确认产品语义、本轮独立架构评审及历史 Claude 复核交叉核对。以下为仓库相对路径；本地预览只提供站点文件，不直接暴露评审轨迹或整个仓库。</p>
 <div class="table-scroll" role="region" tabindex="0" aria-label="页面内容来源">
 <table>
 <thead>
@@ -279,7 +284,7 @@
 <tr>
 <th scope="row">本轮验收与交接</th>
 <td>
-<code>docs/tasks/RV-06-D4-D6-claude-review.md</code>；<code>docs/tasks/RV-06-CP3-closeout.md</code>
+<code>docs/tasks/Architecture-collection-evidence-20261005.md</code>；<code>docs/tasks/Architecture-release-20261005.md</code>；历史 <code>docs/tasks/RV-06-CP3-closeout.md</code>
 </td>
 </tr>
 <tr>
