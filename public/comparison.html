@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Reviewer 与 Recensa、Lenz、Factiverse、Prelint、Patronus 的任务差异，适用场景、输入要求和使用边界。">
+<meta name="theme-color" content="#ffffff">
+<title>竞品与选用 · Reviewer</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="site.js" defer>
+</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+<header class="header">
+<div class="header-inner">
+<a class="brand" href="index.html" aria-label="Reviewer 首页">
+<span class="brand-mark" aria-hidden="true">r<span>✓</span>
+</span>
+<span>Reviewer<small>有据可查的材料评审</small>
+</span>
+</a>
+<nav aria-label="主导航">
+<a href="index.html">概览</a>
+<a href="architecture.html">架构设计</a>
+<a href="comparison.html" aria-current="page">竞品与选用</a>
+<a href="guide.html">使用指南</a>
+<a href="release.html">版本与验收</a>
+</nav>
+<a class="edition" href="release.html#current">0.7.0 · Codex 候选</a>
+</div>
+</header>
+<main id="main">
+<div class="doc-layout wrap">
+<aside class="toc" aria-label="本页目录">
+<p>本页内容</p>
+<a href="#choose">先按任务选择</a>
+<a href="#competitors">竞品对照</a>
+<a href="#difference">Reviewer 的区别</a>
+<a href="#tasks">适用任务与例子</a>
+<a href="#boundaries">边界与投入</a>
+<a href="#sources">来源与比较口径</a>
+</aside>
+<div class="doc-body">
+<div class="doc-hero">
+<p class="eyebrow">FIT / 竞品、差异与任务范围</p>
+<h1>Reviewer，<br>适合这次任务吗？</h1>
+<p class="lead">当你要依据一份 AI 方案、研究或跨文档交付作决定，且需要明确的验收标准、证据和修改后复查，Reviewer 才有用武之地。</p>
+<p class="fine">本页按任务帮助选用，未做竞品横向效果测试。Reviewer 当前为单用户 Codex 候选；真人体验与通用产品有效性仍未验证。</p>
+</div>
+<section class="doc-section" id="choose">
+<p class="eyebrow">01 / 先选任务</p>
+<h2>你现在要决定什么？</h2>
+<div class="fit-grid">
+<article>
+<h3>“这份交付物能接受吗？”</h3>
+<p>目标覆盖、论证质量与事实都要检查，改完还要复查。</p>
+<a href="#tasks">考虑 Reviewer →</a>
+</article>
+<article>
+<h3>“这句话、这个引用对吗？”</h3>
+<p>先看原始来源；需要专门工具时，可考察 Lenz 或 Factiverse 的事实核验能力。</p>
+<a href="#competitors">看事实核验工具 →</a>
+</article>
+<article>
+<h3>“这份文件内部有错吗？”</h3>
+<p>已完成的 DOCX / PDF，要检查数字、交叉引用与来源一致性，可考察 Recensa。</p>
+<a href="#competitors">看文档检查工具 →</a>
+</article>
+<article>
+<h3>“代码或 AI 系统符合要求吗？”</h3>
+<p>PR 与产品规范的对齐可考察 Prelint；持续评测模型输出可考察 Patronus。程序能否运行还要靠测试。</p>
+<a href="#competitors">看工程评审与评测 →</a>
+</article>
+</div>
+<p class="fine">这是基于下方官方定位的选用建议，不是效果排名。只是快速听取意见时，直接请另一位 Agent 看材料通常更省准备。</p>
+</section>
+<section class="doc-section" id="competitors">
+<p class="eyebrow">02 / 竞品对照</p>
+<h2>有重叠，主要任务不同。</h2>
+<p>“带证据”“独立检查”“人保留判断”都不是 Reviewer 独有的能力。这里比较输入、检查重点与输出，不把官网没写的功能判为“不支持”。</p>
+<p class="fine">窄屏可横向滚动表格；选用建议由本站归纳，产品能力来自各行的官方资料（核对于 2026-10-04）。</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="竞品主要任务与 Reviewer 的关系">
+<table class="comparison-table">
+<thead>
+<tr>
+<th scope="col">产品 / 主要对象</th>
+<th scope="col">官方描述的工作方式</th>
+<th scope="col">与 Reviewer 的关系 / 选用判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">Recensa<br>
+<span class="fine">文档检查 · 重叠较大</span>
+</th>
+<td>检查已完成的 DOCX / PDF：内部矛盾、数字、交叉引用，也可对照自带来源与外部来源；输出问题清单、证据和检查报告。文件印记证明完整性，不认证内容正确。<br>
+<a href="https://recensa.ai/product">官方产品说明 ↗</a>
+</td>
+<td>同样围绕整份文档和可查证问题。偏成品文件检查时可优先考察；Reviewer 则把任务目标的标准对齐、Owner 确认与后续复查组织在同一 Codex 流程中。</td>
+</tr>
+<tr>
+<th scope="row">Lenz<br>
+<span class="fine">事实与引用核验</span>
+</th>
+<td>从单条断言或整篇草稿识别事实与引用；深核对照独立来源，返回判断和推理。草稿检查后可选择哪些断言继续深核。<br>
+<a href="https://lenz.io/about">官方工作方式 ↗</a>
+</td>
+<td>覆盖 Reviewer 置信检查中的一部分需求。重点是断言与引文时可考察；如果还要判断方案是否覆盖已确认目标，需另有任务验收标准。</td>
+</tr>
+<tr>
+<th scope="row">Factiverse<br>
+<span class="fine">声明识别与证据核验</span>
+</th>
+<td>从文本、音频、视频识别声明，对照可信来源；官方场景包括媒体研究和 AI 模型审计。<br>
+<a href="https://www.factiverse.ai/">官方能力与场景 ↗</a>
+</td>
+<td>适合考察跨媒介的信息核验需求。Reviewer 当前聚焦材料验收流程，没有已验证的音视频核验承诺。</td>
+</tr>
+<tr>
+<th scope="row">Prelint<br>
+<span class="fine">PR 的产品一致性</span>
+</th>
+<td>把 PR diff 对照产品规范、架构决定与自定义规则，另一次 AI 检查筛选发现，再写入行内评论与检查摘要；新提交触发后续评审。<br>
+<a href="https://prelint.com/docs/how-reviews-work">官方评审流程 ↗</a>
+</td>
+<td>也关心标准、决定和变化。代码是否按产品决定实现，可考察 Prelint；Reviewer 的主对象是方案与研究等交付材料，纯代码审查不在 V1 范围。</td>
+</tr>
+<tr>
+<th scope="row">Patronus<br>
+<span class="fine">AI 输出评测基础设施</span>
+</th>
+<td>用现成或自定义 evaluator 评价模型输出，可组织数据集实验、记录结果并比较实验。<br>
+<a href="https://docs.patronus.ai/docs/quickstart_eval">官方评测入口 ↗</a> · <a href="https://docs.patronus.ai/docs/evaluators/reference_guide">自定义判定标准 ↗</a>
+</td>
+<td>可以定制质量标准，并非只能查幻觉。需要持续评测 RAG、模型或 Agent 系统时可考察；Reviewer 组织的是一份材料从标准确认到人的处置。</td>
+</tr>
+<tr>
+<th scope="row">直接请另一位 Agent 评审<br>
+<span class="fine">工作方法，非单一产品</span>
+</th>
+<td>把材料和要求放进对话，请它给出意见；也能主动要求引用、标准和多轮检查，具体取决于提示与工具。</td>
+<td>低风险快速浏览的直接替代方案。Reviewer 将确认、绑定与复查固化为流程，代价是更多步骤、等待与模型调用；尚无证据证明所有任务上都更划算。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout">
+<strong>最近的对照：Recensa 与直接请 Agent 评审</strong>
+<p>前者与材料检查本身高度重叠，后者在现有对话中即可开始。Reviewer 是否值得用，要看标准对齐与复查记录能否改善你的实际验收；不能靠功能清单替代这个判断。</p>
+</div>
+</section>
+<section class="doc-section" id="difference">
+<p class="eyebrow">03 / Reviewer 的区别</p>
+<h2>把一份材料的验收过程连起来。</h2>
+<ol class="steps">
+<li>
+<h3>先确定这次凭什么判断</h3>
+<p>从任务、已签核上游要求和你确认过的标准出发，对齐范围、排除项、来源、深度与成本。独立检查标准的覆盖和忠实度，再由你确认冻结。</p>
+</li>
+<li>
+<h3>同时检查“合不合目标”和“可不可信”</h3>
+<p>完整评审既查遗漏、逻辑和跨文档一致性，也查事实、数字、引用与结论强度。每个问题关联标准、原文和证据；设计提议与现状断言分开判断。</p>
+</li>
+<li>
+<h3>修改后延续同一次评审</h3>
+<p>依据变更、标准、证据新鲜度和依赖范围决定哪些内容必须重查。保留决定记录，由你接受、要求修改或暂缓；包括首轮最多三轮。</p>
+</li>
+</ol>
+<p>这些是 Reviewer 的组合设计与过程约束，并非“其他工具都做不到”的声明。模型仍可能误判，证据也需要检查。<a href="architecture.html">查看实现与守卫边界 →</a>
+</p>
+</section>
+<section class="doc-section" id="tasks">
+<p class="eyebrow">04 / 适用任务</p>
+<h2>按材料和决定，选入口。</h2>
+<p>以下是基于产品范围的使用示例，不是已逐项验证过的成功案例。文本需能被当前宿主读取；不承诺任意文件格式或任意长度都能直接处理。</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Reviewer 任务范围与准备材料">
+<table class="comparison-table">
+<thead>
+<tr>
+<th scope="col">任务例子</th>
+<th scope="col">准备什么 / 检查什么</th>
+<th scope="col">入口与边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">技术方案或架构签核</th>
+<td>方案、目标、已确认约束与权威资料；查目标遗漏、方案矛盾、未经证明却承载结论的前提。</td>
+<td>
+<a href="guide.html#full">完整评审</a>
+<br>评审通过不能证明代码已部署或性能已达标。</td>
+</tr>
+<tr>
+<th scope="row">产品方案 / PRD</th>
+<td>目标、用户场景、已签核决定与正文；查覆盖、指标口径和推理是否与目标相符。</td>
+<td>
+<a href="guide.html#full">完整评审</a>
+<br>不能替代用户研究或市场效果验证。</td>
+</tr>
+<tr>
+<th scope="row">研究、调研、Roadmap</th>
+<td>报告、原始来源、数据时间范围；查数字、引用、事实和结论强度。</td>
+<td>
+<a href="guide.html#confidence">置信把关</a>
+<br>还要判断研究是否回答业务问题时，选完整评审。</td>
+</tr>
+<tr>
+<th scope="row">跨文档交付 / 交接包</th>
+<td>设计、说明、已签核要求与可访问的运行证据；查各文档口径、承诺和状态是否一致。</td>
+<td>
+<a href="guide.html#full">完整评审</a>
+<br>“文档写了已完成”不等于真实完成；缺运行证据应保留缺口。</td>
+</tr>
+<tr>
+<th scope="row">材料打回后修改</th>
+<td>同一评审 thread 的修订材料、变更说明和补充证据。</td>
+<td>
+<a href="guide.html#recheck">增量复查</a>
+<br>变更牵连的依赖也要查，不能只查改动行。</td>
+</tr>
+<tr>
+<th scope="row">开工前还没讲清标准</th>
+<td>目标、任务、上游决定；正文可尚未写出。</td>
+<td>
+<a href="guide.html#align">仅对齐标准</a>
+<br>交付标准、方案与确认记录；之后检查材料仍需核对适用性、审查并确认。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fit-grid">
+<article>
+<h3>适合：准备签一份系统设计</h3>
+<p>“这是方案和已签核需求。请确认验收标准，检查重试策略是否矛盾、数据删除策略是否遗漏，以及‘当前已上线’是否有证据。”</p>
+<p class="fine">有材料、上游依据和明确决定，可进入完整评审。</p>
+</article>
+<article>
+<h3>先换方法：只想知道服务是否正常</h3>
+<p>“帮我确认这个服务现在能用。”先实际运行、测试并看日志；文字评审无法代替这些操作。</p>
+<p class="fine">拿到运行证据后，Reviewer 可以检查验收说明是否如实表达这些证据。</p>
+</article>
+</div>
+</section>
+<section class="doc-section" id="boundaries">
+<p class="eyebrow">05 / 边界与投入</p>
+<h2>什么情况下不值得用？</h2>
+<ul>
+<li>
+<strong>一个事实、随手浏览：</strong>直接找来源或请 Agent 给第二意见，通常不需要整套流程。</li>
+<li>
+<strong>错别字、排版、文风：</strong>用编辑与校对工具。它们不属于 Reviewer 的产品目标。</li>
+<li>
+<strong>纯代码质量、测试或安全扫描：</strong>使用相应工程工具；Reviewer 不替代单元测试、代码评审与安全验证。</li>
+<li>
+<strong>需要专业认证或无人承担最终决定：</strong>Reviewer 不提供合规认证，也不代替人的风险取舍。没有最终决定人，不适合启动此流程。</li>
+<li>
+<strong>希望团队共同审批、跨宿主直接用：</strong>本轮只适配单用户 Codex；多人协作和其他宿主不是当前已交付范围。</li>
+</ul>
+<div class="callout">
+<strong>开始前带上这四样</strong>
+<p>材料或目标、可引用的上游要求、允许访问的证据来源、最终决定人。检查深度、联网权限和成本上限在标准对齐时确认；不用先手工准备 schema 或 digest。</p>
+</div>
+<p>认真评审会增加对齐、独立检查与复查的时间和模型调用成本。投入上限因任务而定，不预设“一份材料固定多少钱”。来源不可访问或证据不足时，应如实保留缺口。</p>
+<p>当前产品以单用户的长篇和跨文档材料为设计中心；可处理的材料类型是范围说明，不能据此推断已经证明能降低误判率、返工率或总成本。<a href="release.html#limits">查看已经验证与尚未验证的部分 →</a>
+</p>
+<a class="button primary" href="guide.html#start">范围合适，开始使用 →</a>
+</section>
+<section class="doc-section" id="sources">
+<p class="eyebrow">06 / 来源与口径</p>
+<h2>比较可以回查。</h2>
+<p>竞品资料核对日期：2026-10-04。只采用产品方的官方能力与流程说明；未测试竞品、未比较价格、准确率、延迟或安全等级。选用建议属于基于公开定位的判断。</p>
+<ul>
+<li>
+<a href="https://recensa.ai/product">Recensa · 产品与检查范围</a>
+</li>
+<li>
+<a href="https://lenz.io/about">Lenz · 事实、引文与草稿核验</a>
+</li>
+<li>
+<a href="https://www.factiverse.ai/">Factiverse · 声明识别、媒体与审计场景</a>
+</li>
+<li>
+<a href="https://prelint.com/docs/how-reviews-work">Prelint · PR 评审流程</a>
+</li>
+<li>
+<a href="https://docs.patronus.ai/docs/quickstart_eval">Patronus · 评测与批量实验</a> / <a href="https://docs.patronus.ai/docs/evaluators/reference_guide">评测器与自定义标准</a>
+</li>
+</ul>
+<p class="fine">Reviewer 范围依据产品设计 §1、§3–6 和当前 Skills；当前状态依据版本与验收页。任务例子是对这些范围的说明，没有增加产品承诺。<a href="SOURCE-MAP.md">查看仓内来源映射</a>。旧产品文档 §4 的竞品速览基于 2026-08-29 调研，本页以此次核对为准，未修改产品 SSOT。</p>
+</section>
+</div>
+</div>
+</main>
+<footer class="footer wrap">
+<div>
+<strong>Reviewer</strong>
+<span>先对齐标准，再检查材料，决定留给你。</span>
+</div>
+<div>
+<a href="release.html#sources">内容依据</a>
+<a href="guide.html#faq">常见问题</a>
+<a href="#main">回到顶部 ↑</a>
+</div>
+<p>文档快照 · 2026-10-04 · 首轮适配 Codex · 当前固定影子模式</p>
+</footer>
+<div id="notice" class="notice" role="status" aria-live="polite">
+</div>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Reviewer 的两条 Loop、Host/Skills/Runtime/SDK 分层、可信绑定、增量复查和恢复边界。">
+<meta name="theme-color" content="#ffffff">
+<title>架构设计 · Reviewer</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="site.js" defer>
+</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+<header class="header">
+<div class="header-inner">
+<a class="brand" href="index.html" aria-label="Reviewer 首页">
+<span class="brand-mark" aria-hidden="true">r<span>✓</span>
+</span>
+<span>Reviewer<small>有据可查的材料评审</small>
+</span>
+</a>
+<nav aria-label="主导航">
+<a href="index.html">概览</a>
+<a href="architecture.html" aria-current="page">架构设计</a>
+<a href="comparison.html">竞品与选用</a>
+<a href="guide.html">使用指南</a>
+<a href="release.html">版本与验收</a>
+</nav>
+<a class="edition" href="release.html#current">0.7.0 · Codex 候选</a>
+</div>
+</header>
+<main id="main">
+<div class="doc-layout wrap">
+<aside class="toc" aria-label="本页目录">
+<p>本页内容</p>
+<a href="#map">职责分层</a>
+<a href="#loops">两条 Loop</a>
+<a href="#criteria">固定标准</a>
+<a href="#evidence">证据与绑定</a>
+<a href="#recheck">增量复查</a>
+<a href="#recovery">失败与恢复</a>
+<a href="#storage">本地状态</a>
+<a href="#modules">实现索引</a>
+</aside>
+<div class="doc-body">
+<div class="doc-hero">
+<p class="eyebrow">ARCHITECTURE / 设计与实现</p>
+<h1>模型做判断，<br>软件守住过程。</h1>
+<p class="lead">宿主提供身份与交互，Skills 指导评审方法，Reviewer 保存业务状态，Task State SDK 管理决定与执行恢复。最终决定来自人的真实回复。</p>
+</div>
+<section id="map" class="doc-section">
+<p class="eyebrow">01 / 职责分层</p>
+<h2>从发起，到可追溯的决定。</h2>
+<p>点选层级查看职责与边界。这是架构说明，不连接运行中的评审。</p>
+<div class="architecture-map">
+<div class="layer-stack" role="group" aria-label="架构层级">
+<button type="button" class="layer active" data-layer="owner" aria-pressed="true">
+<span class="layer-num">01</span>
+<span>
+<strong>你 · 材料 Owner</strong>
+<small>目标、标准确认、例外与最终决定</small>
+</span>
+<span aria-hidden="true">↗</span>
+</button>
+<div class="connector">↓ 发起任务 / 回答问题卡</div>
+<button type="button" class="layer" data-layer="host" aria-pressed="false">
+<span class="layer-num">02</span>
+<span>
+<strong>Codex 宿主</strong>
+<small>对话、子任务、hook、原生交互</small>
+</span>
+<span aria-hidden="true">↗</span>
+</button>
+<div class="connector">↓ Skills 指导 Agent · MCP 承接动作</div>
+<button type="button" class="layer" data-layer="runtime" aria-pressed="false">
+<span class="layer-num">03</span>
+<span>
+<strong>Reviewer Runtime</strong>
+<small>两条 Loop、任务绑定、证据与成本</small>
+</span>
+<span aria-hidden="true">↗</span>
+</button>
+<div class="connector">↓ 可信接线 / 持久化协议</div>
+<button type="button" class="layer" data-layer="sdk" aria-pressed="false">
+<span class="layer-num">04</span>
+<span>
+<strong>Task State SDK · 0.5.0</strong>
+<small>决定回执、调用日志、锁与恢复</small>
+</span>
+<span aria-hidden="true">↗</span>
+</button>
+<div class="connector">↓ 业务 head + SDK journal</div>
+<button type="button" class="layer" data-layer="storage" aria-pressed="false">
+<span class="layer-num">05</span>
+<span>
+<strong>本地状态与产物</strong>
+<small>材料快照、版本化对象、标准账本</small>
+</span>
+<span aria-hidden="true">↗</span>
+</button>
+</div>
+<div class="layer-detail" aria-live="polite">
+<p class="eyebrow" id="layer-kicker">决定层</p>
+<h3 id="layer-title">人保留决定权</h3>
+<p id="layer-description">你确认标准与评审方案，并决定材料是否接受。超出成本、改变范围或跳过规定检查时，也由你作取舍。</p>
+<div class="callout">
+<strong>职责边界</strong>
+<p id="layer-boundary">Agent 可以提案和解释，但不能把自己的输出写成你的决定；测试客户端答复也不能证明真人验收。</p>
+</div>
+<p class="fine" id="layer-source">依据：产品设计 §5–6；Reviewer 入口 skill</p>
+<button class="button secondary" id="copy-architecture">复制架构 JSON</button>
+</div>
+</div>
+<noscript>
+<p>完整职责：Owner 作决定；Codex 提供交互与身份；Reviewer 执行业务守卫；SDK 记录回执与恢复；本地存储保留快照与产物。启用 JavaScript 可查看逐层说明。</p>
+</noscript>
+</section>
+<section id="loops" class="doc-section">
+<p class="eyebrow">02 / 两条产品 Loop</p>
+<h2>标准冻结，检查才开始。</h2>
+<div class="flow">
+<article>
+<span class="loop-label">LOOP 1 · 标准</span>
+<h3>任务 + 已签核来源 + 标准账本</h3>
+<p>起草 → 新增／冲突项表态 → 构建不可变提案 → 独立覆盖与忠实度审查 → Owner 整体确认 → 冻结并补账</p>
+<div class="callout">
+<strong>退回就必须修改</strong>
+<p>审查未过先返修；Owner 退回后也要改提案并重审。不能用 A → B → A 重新提交旧稿，或用旧审查开确认卡。</p>
+</div>
+</article>
+<div class="flow-arrow">↓ 冻结标准与检查方案</div>
+<article>
+<span class="loop-label">LOOP 2 · 材料</span>
+<h3>拆单元 → 快筛 → 深核 → 独立复核</h3>
+<p>协调发现与分歧 → 形成当前最终页 → 处理必要的标准分叉 → Owner 决定 → 修改后增量复查</p>
+<div class="callout">
+<strong>独立不是自报字段</strong>
+<p>Runtime 核对实际子 thread、父会话、任务单、attempt 和输入版本。复核者读取原材料与发现定位，不接受原深核结论理由。</p>
+</div>
+</article>
+</div>
+<p>仅对齐模式在 Loop 1 交付标准后结束；后续检查材料需要新建评审并核对适用性。改范围回 Loop 1；同范围的普通复查不重新确认标准。</p>
+</section>
+<section id="criteria" class="doc-section">
+<p class="eyebrow">03 / 检查依据</p>
+<h2>项目标准 + 五条固定置信规则。</h2>
+<div class="table-scroll" role="region" tabindex="0" aria-label="五条固定置信规则">
+<table>
+<thead>
+<tr>
+<th scope="col">规则</th>
+<th scope="col">核验什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">CR-1 · 事实</th>
+<td>版本、状态、时间、数字、支持关系和归属是否与一手来源一致。</td>
+</tr>
+<tr>
+<th scope="row">CR-2 · 引用</th>
+<td>来源不仅要存在，还要真正支持被引用的那句话。</td>
+</tr>
+<tr>
+<th scope="row">CR-3 · 不杜撰</th>
+<td>不存在查无实据的来源、版本、API、术语和数据。</td>
+</tr>
+<tr>
+<th scope="row">CR-4 · 强度与地位</th>
+<td>“已证明”“唯一”“共识”及自称权威、SSOT 的声明同样接受事实核验。</td>
+</tr>
+<tr>
+<th scope="row">CR-5 · 前提</th>
+<td>未经验证的前提不能以已证实的口吻支撑结论。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+<strong>防止误报同样重要。</strong>内部设计选择按整篇设计语境理解，无须逐句证明已经存在；但“当前已部署”“已经验证”等现状断言仍需核验。历史标签、披露的过时内容和同义术语本身不等于杜撰，允许来源之外也不能自行扩查。</p>
+<p>杜撰无论出现在哪里都阻断；其余四类在承载结论的单元上不满足或证据不足时阻断，非承载问题作为修改项。承载性拿不准时按承载处理。</p>
+</section>
+<section id="evidence" class="doc-section">
+<p class="eyebrow">04 / 三条证据路径</p>
+<h2>身份、输入、决定分别绑定。</h2>
+<div class="table-scroll" role="region" tabindex="0" aria-label="三类绑定路径">
+<table>
+<thead>
+<tr>
+<th scope="col">路径</th>
+<th scope="col">如何建立</th>
+<th scope="col">拒绝什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">子任务结果</th>
+<td>assign 发任务单 → 宿主启动独立子任务 → collect 从可信轨迹读取最终结果</td>
+<td>错任务、旧 attempt、身份不明、未完成、结果缺项或绑定不匹配</td>
+</tr>
+<tr>
+<th scope="row">检查输入</th>
+<td>冻结材料、标准、方案和单元清单；结果回连对应 digest、原文和允许来源</td>
+<td>拿新磁盘内容替代旧快照，或把过期结果挪给新版本</td>
+</tr>
+<tr>
+<th scope="row">人的决定</th>
+<td>Runtime 开 ticket → 原生卡呈现 → 绑定真实 questionItemId → 从宿主回复取答案</td>
+<td>Agent 自报答案、缩改题面、旧卡答案挪用、把沉默当同意</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout">
+<strong>结构通过不等于内容为真</strong>
+<p>SDK 和 Runtime 能检查回执、字段与版本关系；“是否忠实理解标准”“证据是否支持断言”仍属于语义核验，可能产生分歧，也可能出错。</p>
+</div>
+</section>
+<section id="recheck" class="doc-section">
+<p class="eyebrow">05 / 增量复查</p>
+<h2>重查影响范围，不只重查改过的段落。</h2>
+<div class="recheck-diagram">
+<div>
+<strong>四类变化种子</strong>
+<p>材料节改动或删除<br>标准条目变化<br>证据过期或来源变化<br>新增单元</p>
+</div>
+<span aria-hidden="true">→</span>
+<div>
+<strong>反向依赖闭包</strong>
+<p>找出依赖这些变化的单元，再沿依赖继续展开。</p>
+</div>
+<span aria-hidden="true">→</span>
+<div>
+<strong>重查 / 有据沿用</strong>
+<p>闭包内重新核验；闭包外只有具备版本和新鲜度凭据才能沿用。</p>
+</div>
+</div>
+<p>例子：引用的服务版本变了，即使方案文字未变，依赖该版本能力的论证和结论也要重查。上一轮接受的检查缺口风险不自动继承。</p>
+<p>本轮新结果仅在其声明的 TTL 实际到期时失效；缺少新鲜度字段影响下一轮能否沿用。包括首轮在内最多三轮，第三轮仍有阻断就停止并说明原因。</p>
+</section>
+<section id="recovery" class="doc-section">
+<p class="eyebrow">06 / 执行与恢复</p>
+<h2>把技术故障和业务问题分开。</h2>
+<div class="table-scroll" role="region" tabindex="0" aria-label="失败及恢复边界">
+<table>
+<thead>
+<tr>
+<th scope="col">事件</th>
+<th scope="col">当前处理</th>
+<th scope="col">不代表什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">技术结果无效</th>
+<td>拒收并记录失败；第一次可重派一次，第二次耗尽按阶段进入控制或缺口处理</td>
+<td>不能靠换提案、换任务名不断清零重试</td>
+</tr>
+<tr>
+<th scope="row">证据仍有分歧</th>
+<td>保留 dissent 和证据不足，按标准判断影响</td>
+<td>完成了独立检查不意味着必须强行统一结论</td>
+</tr>
+<tr>
+<th scope="row">成本达到上限</th>
+<td>暂停新派发与新结果采纳，交人选择放行、按现有结果收尾或停止</td>
+<td>风险接受不把证据不足变成通过；迟到消耗仍记账</td>
+</tr>
+<tr>
+<th scope="row">中断 / 进程重启</th>
+<td>同 thread 查 status，从业务 head 与 SDK journal 继续</td>
+<td>跨 thread 不继承旧决定权限</td>
+</tr>
+<tr>
+<th scope="row">持久化完成记录失败</th>
+<td>达到边界后进入只读并退出，交新进程恢复</td>
+<td>不手改 journal 或 head 解锁推进</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="storage" class="doc-section">
+<p class="eyebrow">07 / 本地落盘</p>
+<h2>原始状态与可读产物分开。</h2>
+<div class="file-tree">
+<code>.reviewer/<br>├─ threads/&lt;thread-id&gt;.json　当前 thread 索引<br>└─ reviews/&lt;review-id&gt;/　评审工作区<br>　　├─ head.json　领域读取入口<br>　　├─ …　SHA-256 寻址对象与版本<br>　　└─ final/　可重建的 Markdown 产物</code>
+</div>
+<p>SDK 状态位于 <code>${XDG_STATE_HOME:-~/.local/state}/reviewer/v1/sdk/</code>；标准账本位于同级 <code>ledger/ledger.jsonl</code>。原子提交后 head 指向完整版本；未提交残留对象保留，不当作当前结果。</p>
+<p>Markdown 是可重建副本，生成失败会报告 warning，不推翻已经提交的业务状态。新旧状态根隔离；旧材料和工作区不自动迁移。</p>
+</section>
+<section id="modules" class="doc-section">
+<p class="eyebrow">08 / 实现索引</p>
+<h2>方法、业务和通用状态各有所属。</h2>
+<div class="table-scroll" role="region" tabindex="0" aria-label="工程模块职责">
+<table>
+<thead>
+<tr>
+<th scope="col">部分</th>
+<th scope="col">位置（相对插件根）</th>
+<th scope="col">职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">五个 Skills</th>
+<td>
+<code>skills/reviewer*</code>
+</td>
+<td>入口路由、对齐、拆单元、核验与复查方法</td>
+</tr>
+<tr>
+<th scope="row">MCP / 宿主接线</th>
+<td>
+<code>lib/server.mjs</code>、<code>hook.mjs</code>、<code>workspace.mjs</code>
+</td>
+<td>可信会话绑定、工具调度、材料快照、真实子任务定位</td>
+</tr>
+<tr>
+<th scope="row">业务逻辑</th>
+<td>
+<code>alignment.mjs</code>、<code>loop2.mjs</code>、<code>checks.mjs</code>、<code>recheck.mjs</code>
+</td>
+<td>两条 Loop、结果投影、复查范围与业务守卫</td>
+</tr>
+<tr>
+<th scope="row">持久化与交互</th>
+<td>
+<code>persist.mjs</code>、<code>ledger.mjs</code>、<code>native.mjs</code>、<code>policy.mjs</code>
+</td>
+<td>业务提交、账本补写、原生卡片和决定绑定</td>
+</tr>
+<tr>
+<th scope="row">成本</th>
+<td>
+<code>usage.mjs</code>、<code>data/prices.json</code>
+</td>
+<td>冻结单价、thread/response 去重和归属</td>
+</tr>
+<tr>
+<th scope="row">通用 SDK</th>
+<td>
+<code>vendor/task-state-sdk/</code>
+</td>
+<td>0.5.0 原字节 exporter 快照；单进程只加载一份</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Matt 与 Reviewer 可以使用同一来源的 SDK，但各自携带固定版本；更新 Matt 插件不会自动升级 Reviewer 的 SDK。验收时的可配置多模型判官是外部评价工具，不是 V1 日常流程内的多模型陪审。</p>
+</section>
+</div>
+</div>
+</main>
+<footer class="footer wrap">
+<div>
+<strong>Reviewer</strong>
+<span>先对齐标准，再检查材料，决定留给你。</span>
+</div>
+<div>
+<a href="release.html#sources">内容依据</a>
+<a href="guide.html#faq">常见问题</a>
+<a href="#main">回到顶部 ↑</a>
+</div>
+<p>文档快照 · 2026-10-04 · 首轮适配 Codex · 当前固定影子模式</p>
+</footer>
+<div id="notice" class="notice" role="status" aria-live="polite">
+</div>
+</body>
+</html>

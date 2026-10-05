@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Reviewer 先对齐评审标准，再检查目标、逻辑与事实。了解 Codex 使用方式、架构、证据与版本状态。">
+<meta name="theme-color" content="#ffffff">
+<title>有据可查的材料评审 · Reviewer</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="site.js" defer>
+</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+<header class="header">
+<div class="header-inner">
+<a class="brand" href="index.html" aria-label="Reviewer 首页">
+<span class="brand-mark" aria-hidden="true">r<span>✓</span>
+</span>
+<span>Reviewer<small>有据可查的材料评审</small>
+</span>
+</a>
+<nav aria-label="主导航">
+<a href="index.html" aria-current="page">概览</a>
+<a href="architecture.html">架构设计</a>
+<a href="comparison.html">竞品与选用</a>
+<a href="guide.html">使用指南</a>
+<a href="release.html">版本与验收</a>
+</nav>
+<a class="edition" href="release.html#current">0.7.0 · Codex 候选</a>
+</div>
+</header>
+<main id="main">
+<section class="hero wrap">
+<div>
+<p class="eyebrow">
+<span class="rule">
+</span>从 AI 材料，到有依据的决定</p>
+<h1>先说清什么算好，<br>再决定能否接受。</h1>
+<p class="lead">Reviewer 帮你检查长篇方案、研究和跨文档交付：是否覆盖目标，推理是否成立，事实与引用是否可信。每个问题都回到标准、原文和证据。</p>
+<div class="actions">
+<a class="button primary" href="guide.html#start">开始使用 <span aria-hidden="true">→</span>
+</a>
+<a class="text-link" href="architecture.html">了解工作原理 ↗</a>
+</div>
+<p class="fine">0.7.0 修复候选已完成 CP3 验收与发布清单。<br>本站提供产品说明与指南；插件包尚未公开分发。<a href="release.html#current">查看准确状态</a>
+</p>
+</div>
+<div class="report-preview" aria-label="虚构材料评审示例，不是真实运行">
+<div class="report-top">
+<span class="mono">REVIEW / 技术方案</span>
+<span class="tag">示意</span>
+</div>
+<div class="report-body">
+<p class="report-label">一条可查证的问题</p>
+<h2>“当前已部署”<br>缺少现状证据。</h2>
+<p class="quote">“当前 worker 已在生产环境执行这项规则。”</p>
+<dl class="evidence-chain">
+<div>
+<dt>标准</dt>
+<dd>CR-1 · 状态断言须与一手来源一致</dd>
+</div>
+<div>
+<dt>原文</dt>
+<dd>方案 §4 · 现存状态声明</dd>
+</div>
+<div>
+<dt>证据</dt>
+<dd>设计合同说明目标行为，无法证明已部署</dd>
+</div>
+</dl>
+<div class="report-outcome">
+<span class="badge warning">证据不足</span>
+<span>补现状证据，或收窄表述</span>
+</div>
+</div>
+<div class="report-bottom">整理证据与未解项，最终是否接受由你决定。</div>
+</div>
+</section>
+<div class="principles">
+<div class="wrap">
+<span>
+<b>01</b> 标准先确认</span>
+<span>
+<b>02</b> 问题有出处</span>
+<span>
+<b>03</b> 修改可复查</span>
+<span>
+<b>04</b> 人保留决定权</span>
+</div>
+</div>
+<section class="wrap section" id="scenarios">
+<div class="section-head">
+<div>
+<p class="eyebrow">四种开始方式</p>
+<h2>从你要做的决定出发。</h2>
+</div>
+<p>适合需要认真验收的材料。低风险的随手浏览，仍可直接对话。</p>
+</div>
+<div class="scenario-grid">
+<a href="guide.html#full">
+<span class="mono">01 / REVIEW</span>
+<h3>签核前，完整评审 ↗</h3>
+<p>对照目标、上游决定和材料，形成标准，再检查契合、逻辑与事实。</p>
+<small>产品方案 · 技术设计 · 跨文档交付</small>
+</a>
+<a href="guide.html#confidence">
+<span class="mono">02 / CONFIDENCE</span>
+<h3>长材料，置信把关 ↗</h3>
+<p>聚焦事实、数字、引用与结论强度；只确认固定置信规则和检查方案。</p>
+<small>研究 · 调研 · Roadmap</small>
+</a>
+<a href="guide.html#recheck">
+<span class="mono">03 / RECHECK</span>
+<h3>改完后，增量复查 ↗</h3>
+<p>重查变更与受影响的依赖，说明哪些结果仍可沿用。</p>
+<small>同一评审 · 包括首轮最多三轮</small>
+</a>
+<a href="guide.html#align">
+<span class="mono">04 / ALIGN</span>
+<h3>先把标准谈清楚 ↗</h3>
+<p>可以尚无材料正文。交付确认过的标准与方案，这次先不检查材料。</p>
+<small>开工前 · 仅对齐标准</small>
+</a>
+</div>
+</section>
+<section class="band">
+<div class="wrap section">
+<div class="section-head">
+<div>
+<p class="eyebrow">完整评审路径</p>
+<h2>两条 Loop，连接标准与材料。</h2>
+</div>
+<a href="architecture.html#loops">查看流程与返回路径 →</a>
+</div>
+<div class="loops">
+<article>
+<span class="loop-label">LOOP 1</span>
+<h3>对齐“什么算好”</h3>
+<p>读取任务与已签核依据，核对历史口径。对新增和冲突项表态后，提案先经独立审查，再由你确认标准和方案。</p>
+<ol>
+<li>起草标准与范围</li>
+<li>独立审查覆盖与忠实度</li>
+<li>确认并冻结</li>
+</ol>
+<div class="loop-result">产出：冻结标准、检查方案、决定记录</div>
+</article>
+<article>
+<span class="loop-label">LOOP 2</span>
+<h3>检查“材料达到了吗”</h3>
+<p>按单元快筛、深核与独立复核，保留证据和分歧。最终处置由你决定，修改后按影响范围复查。</p>
+<ol>
+<li>拆分与分流核验</li>
+<li>协调证据和未解项</li>
+<li>你决定接受或修改</li>
+</ol>
+<div class="loop-result">产出：带证据的最终页、复查记录</div>
+</article>
+</div>
+<p class="fine">恢复、状态和成本记账支撑这两条 Loop，不另构成第三条产品流程。</p>
+</div>
+</section>
+<section class="wrap section">
+<div class="section-head">
+<div>
+<p class="eyebrow">你拿到什么</p>
+<h2>看到结论，也能查回依据。</h2>
+</div>
+<p>当前影子模式呈现检查结果和处置选项，不自动生成接受建议。</p>
+</div>
+<div class="deliverables">
+<article>
+<span class="index-no">A</span>
+<h3>标准与方案</h3>
+<p>检查什么、允许用哪些来源、是否联网、深核规则和成本上限，以及本次排除和假设。</p>
+</article>
+<article>
+<span class="index-no">B</span>
+<h3>证据与缺口</h3>
+<p>每条问题对应标准和材料位置；区分阻断、修改项、证据不足、未覆盖和已接受风险。</p>
+</article>
+<article>
+<span class="index-no">C</span>
+<h3>决定与复查</h3>
+<p>保留每轮处置、材料版本和依据。改了什么、重查了什么、沿用了什么，都可追溯。</p>
+</article>
+</div>
+</section>
+<section class="wrap section" id="comparison">
+<div class="section-head">
+<div>
+<p class="eyebrow">为什么使用插件</p>
+<h2>让评审有连续的依据。</h2>
+</div>
+</div>
+<div class="table-scroll" role="region" tabindex="0" aria-label="直接对话与 Reviewer 对比">
+<table>
+<thead>
+<tr>
+<th scope="col">你关心的事</th>
+<th scope="col">直接请 LLM 看看</th>
+<th scope="col">Reviewer 的约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">评审标准</th>
+<td>随提问和上下文组织</td>
+<td>先确认标准、来源与评审方案，检查时按冻结版本执行</td>
+</tr>
+<tr>
+<th scope="row">问题凭据</th>
+<td>取决于单次回答质量</td>
+<td>关联标准、原文、允许来源；结构完整不等于语义正确，仍需独立核验</td>
+</tr>
+<tr>
+<th scope="row">独立性</th>
+<td>可换独立对话；独立性取决于上下文与工具安排</td>
+<td>独立上下文检查标准与关键发现，核对真实任务身份和输入绑定</td>
+</tr>
+<tr>
+<th scope="row">修改之后</th>
+<td>可手动提供变更与旧结论，安排复查</td>
+<td>按变更、标准、证据新鲜度与依赖范围复查</td>
+</tr>
+<tr>
+<th scope="row">你的决定</th>
+<td>需要自行区分人的决定与 Agent 的建议</td>
+<td>以原生问题卡的真实回复形成决定回执，沉默不算同意</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="fine">Reviewer 仍使用模型做语义判断；软件守卫负责过程约束，无法保证模型永远正确。</p>
+</section>
+<section class="wrap section" id="choose">
+<div class="section-head"><div><p class="eyebrow">竞品与任务选择</p><h2>什么时候，该用 Reviewer？</h2></div><a href="comparison.html">完整竞品对照与任务范围 →</a></div>
+<p>需要按已确认标准验收一份方案、研究或跨文档交付，并在修改后复查时，考虑 Reviewer。只查事实、检查成品文件或评审代码时，也有更聚焦的工具。</p>
+<div class="fit-grid">
+<article><h3>最接近的替代</h3><p>Recensa 也检查整份文档与来源；直接请另一位 Agent 评审则几乎没有准备成本。“有证据”不是 Reviewer 独有。</p><a href="comparison.html#competitors">比较实际工作方式 →</a></article>
+<article><h3>区别与代价</h3><p>Reviewer 把标准确认、材料检查、人的处置与增量复查连成流程。是否值得额外的时间和模型调用，要看这次验收的重要性。</p><a href="comparison.html#tasks">按具体任务选择入口 →</a></article>
+</div>
+</section>
+<section class="band">
+<div class="wrap section split">
+<div>
+<p class="eyebrow">适用范围</p>
+<h2>用于材料验收，<br>保留人的判断。</h2>
+<p>当前 V1 是面向单用户的本地 Codex 插件。更适合长篇研究、产品与技术方案，不替代单元测试、纯代码审查、合规认证或人的风险取舍。</p>
+</div>
+<div>
+<h3>当前支持</h3>
+<ul class="check-list">
+<li>Codex 原生问题卡与同 thread 恢复</li>
+<li>标准对齐、材料核验与增量复查</li>
+<li>有界重试、成本暂停、可追溯状态</li>
+</ul>
+<p class="fine">其他宿主适配、多人协作、通用产品有效性不在本轮通过范围。<a href="release.html#limits">查看验证边界 →</a>
+</p>
+</div>
+</div>
+</section>
+<section class="wrap section next-links">
+<a href="guide.html">
+<span class="eyebrow">给使用者</span>
+<h2>从第一份材料开始 →</h2>
+<p>可复制的启动语句、安装步骤与常见问题。</p>
+</a>
+<a href="architecture.html">
+<span class="eyebrow">给技术读者</span>
+<h2>看清职责与证据链 →</h2>
+<p>Host、Skills、Runtime、SDK 如何配合。</p>
+</a>
+</section>
+</main>
+<footer class="footer wrap">
+<div>
+<strong>Reviewer</strong>
+<span>先对齐标准，再检查材料，决定留给你。</span>
+</div>
+<div>
+<a href="release.html#sources">内容依据</a>
+<a href="guide.html#faq">常见问题</a>
+<a href="#main">回到顶部 ↑</a>
+</div>
+<p>文档快照 · 2026-10-05 · 首轮适配 Codex · 当前固定影子模式</p>
+</footer>
+<div id="notice" class="notice" role="status" aria-live="polite">
+</div>
+</body>
+</html>

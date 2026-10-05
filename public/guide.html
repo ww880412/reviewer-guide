@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Reviewer Codex 安装、四种启动方式、原生卡片、增量复查、成本与恢复指南。">
+<meta name="theme-color" content="#ffffff">
+<title>使用指南 · Reviewer</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="site.js" defer>
+</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+<header class="header">
+<div class="header-inner">
+<a class="brand" href="index.html" aria-label="Reviewer 首页">
+<span class="brand-mark" aria-hidden="true">r<span>✓</span>
+</span>
+<span>Reviewer<small>有据可查的材料评审</small>
+</span>
+</a>
+<nav aria-label="主导航">
+<a href="index.html">概览</a>
+<a href="architecture.html">架构设计</a>
+<a href="comparison.html">竞品与选用</a>
+<a href="guide.html" aria-current="page">使用指南</a>
+<a href="release.html">版本与验收</a>
+</nav>
+<a class="edition" href="release.html#current">0.7.0 · Codex 候选</a>
+</div>
+</header>
+<main id="main">
+<div class="doc-layout wrap">
+<aside class="toc" aria-label="本页目录">
+<p>本页内容</p>
+<a href="#before">安装与前提</a>
+<a href="#start">第一次使用</a>
+<a href="#full">完整评审</a>
+<a href="#confidence">置信把关</a>
+<a href="#align">仅对齐标准</a>
+<a href="#recheck">增量复查</a>
+<a href="#decisions">何时需要你</a>
+<a href="#read">如何读结果</a>
+<a href="#cost">成本与数据</a>
+<a href="#reference">操作速查</a>
+<a href="#faq">常见问题</a>
+</aside>
+<div class="doc-body">
+<div class="doc-hero">
+<p class="eyebrow">GUIDE / 安装与日常使用</p>
+<h1>给出材料和目标，<br>从一条请求开始。</h1>
+<p class="lead">你负责说明这次要作什么决定；Agent 负责组织检查、调用工具和整理证据。常规使用不需要手填 JSON、digest 或任务 ID。</p>
+</div>
+<section id="before" class="doc-section">
+<p class="eyebrow">01 / 安装前</p>
+<h2>先确认你拿到的是哪份代码。</h2>
+<p>首轮仅适配 Codex。当前 0.7.0 修复候选已完成固定补验、Claude 复核及 CP3，发布清单已生成，插件包尚未公开分发；本页没有公开下载包或一键升级按钮。下面是已有本地源码时的安装方法，不会因浏览页面而执行。</p>
+<ul>
+<li>具备支持插件、原生异步问题卡与独立子任务的 Codex 宿主。</li>
+<li>Node 已验证版本为 <code>24.13.0</code> / <code>25.4.0</code>，最低兼容版本尚未声明。</li>
+<li>插件无 npm 运行依赖，自带固定 Task State SDK 快照。</li>
+<li>从提供该候选的独立 checkout 操作，核对 <code>plugins/reviewer</code> 包内容；版本号相同也可能是不同字节。</li>
+</ul>
+<div class="copy-block">
+<pre id="install-command">
+<code># 在已核对的 reviewer-plugin 仓库根目录执行
+codex plugin marketplace add &quot;$PWD&quot; --json
+codex plugin add reviewer@reviewer-local --json</code>
+</pre>
+<button class="copy" data-copy="install-command" aria-label="复制# 在已核对的 ">复制</button>
+</div>
+<p>这是 <code>reviewer-local</code> 本地安装源，不是公开市场发布。安装后核对并信任三个实际 hook（SessionStart、UserPromptSubmit、SubagentStop）的 hash，再在新 thread 中开始。</p>
+<div class="callout">
+<strong>安装后先检查绑定</strong>
+<p>让 Agent 调用 <code>reviewer_status</code>。若返回 <code>unbound</code>，先处理 hook 绑定；没有可信身份时，插件拒绝写入。不要让 Agent 猜 thread ID 或伪造回执。</p>
+</div>
+</section>
+<section id="start" class="doc-section">
+<p class="eyebrow">02 / 第一次使用</p>
+<h2>准备材料、依据和这次的目标。</h2>
+<ol class="steps">
+<li>
+<strong>把文件放进当前项目</strong>
+<p>使用明确的项目内相对路径。材料与任务说明、已签核上游依据分别标注；推荐文本或 Markdown，二进制材料先整理为可核对文本。</p>
+</li>
+<li>
+<strong>选择 Reviewer skill 并描述范围</strong>
+<p>在 Codex 选择 Reviewer，或用下方 <code>$reviewer</code> 示例。文件路径是示例，换成你项目内的真实文件。</p>
+</li>
+<li>
+<strong>确认标准与方案</strong>
+<p>新增或冲突项需要你表态；独立审查完成后，再确认检查范围、来源、是否联网与成本上限。</p>
+</li>
+<li>
+<strong>在最终卡作决定</strong>
+<p>检查证据与未解决项，选择接受、附修改建议接受、要求修改、暂缓或拒绝。页面示例不会替你发送决定。</p>
+</li>
+</ol>
+</section>
+<section id="full" class="doc-section">
+<p class="eyebrow">03 / 完整评审</p>
+<h2>方案准备签核时。</h2>
+<div class="copy-block">
+<pre id="prompt-full">
+<code>$reviewer
+请完整评审 docs/proposal.md。
+目标：判断是否满足 docs/task.md 的交付要求。
+上游依据：docs/approved-constraints.md（已签核）。
+先对齐评审标准和方案，再检查目标覆盖、推理与事实。
+先只用项目内来源；是否需要联网、成本上限在方案中确认。</code>
+</pre>
+<button class="copy" data-copy="prompt-full" aria-label="复制$reviewe">复制</button>
+</div>
+<p>预期路径：对齐 → 独立审查 → 你确认 → 拆单元并检查 → 证据协调 → 最终处置。方案里的新增要求不会因为 Agent 写出来就成为你同意的标准。</p>
+</section>
+<section id="confidence" class="doc-section">
+<p class="eyebrow">04 / 置信把关</p>
+<h2>不增加项目要求，先查可信度。</h2>
+<div class="copy-block">
+<pre id="prompt-confidence">
+<code>$reviewer
+请对 docs/research.md 做长材料置信把关。
+只使用固定置信规则，检查事实、数字、引用和结论强度。
+先确认评审方案与允许来源，不额外增加项目验收标准。</code>
+</pre>
+<button class="copy" data-copy="prompt-confidence" aria-label="复制$reviewe">复制</button>
+</div>
+<p>仍会对齐和确认方案；它不是跳过 Loop 1 的快捷开关。来源确实存在但不支持断言，依然不能当作依据。</p>
+</section>
+<section id="align" class="doc-section">
+<p class="eyebrow">05 / 仅对齐</p>
+<h2>正文未完成，也可以先确定验收标准。</h2>
+<div class="copy-block">
+<pre id="prompt-align">
+<code>$reviewer-align
+本次仅对齐评审标准，先不检查材料。
+任务说明在 docs/task.md，上游已签核决定在 docs/decisions.md。
+请形成标准、范围、排除项、假设和评审方案。</code>
+</pre>
+<button class="copy" data-copy="prompt-align" aria-label="复制$reviewe">复制</button>
+</div>
+<p>Agent 使用 <code>alignment_only</code> 模式，可尚无正文。完成标准确认与账本记录后交付 <code>final/alignment.md</code>；这不代表材料已经通过。后来要评审材料，须新建评审并重新核对适用性。</p>
+</section>
+<section id="recheck" class="doc-section">
+<p class="eyebrow">06 / 修改后复查</p>
+<h2>沿原 thread 继续。</h2>
+<div class="copy-block">
+<pre id="prompt-recheck">
+<code>$reviewer-recheck
+我已修改 docs/proposal.md，请继续当前评审的增量复查。
+范围不变。请说明改动影响、重跑的检查、沿用的结果及依据，
+最后保留本轮需要我决定的未解决项。</code>
+</pre>
+<button class="copy" data-copy="prompt-recheck" aria-label="复制$reviewe">复制</button>
+</div>
+<p>先完成上一轮处置，再进入复查。软件根据材料、标准、来源和依赖计算范围；不是只看你标注改过的段落。范围不变时不重问标准，例外决定仍需真实回复；包括首轮最多三轮。</p>
+</section>
+<section id="decisions" class="doc-section">
+<p class="eyebrow">07 / 人机分工</p>
+<h2>哪些事需要你回答？</h2>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Owner 与 Agent 分工">
+<table>
+<thead>
+<tr>
+<th scope="col">时刻</th>
+<th scope="col">你需要做什么</th>
+<th scope="col">Agent 负责什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">标准有新增或冲突</th>
+<td>对影响范围、证据或验收的条目表态</td>
+<td>给出来源、差异和具体选项；普通实现选择自主处理</td>
+</tr>
+<tr>
+<th scope="row">开始检查之前</th>
+<td>确认整体标准与方案</td>
+<td>先完成覆盖和忠实度独立审查</td>
+</tr>
+<tr>
+<th scope="row">出现业务例外</th>
+<td>决定改范围、接受具体检查缺口风险，或超成本放行</td>
+<td>说明缺口及后果，保留未解项</td>
+</tr>
+<tr>
+<th scope="row">最终处置</th>
+<td>看结果和证据，接受、修改、暂缓或拒绝</td>
+<td>展示本轮有效投影、未覆盖和成本</td>
+</tr>
+<tr>
+<th scope="row">恢复或结束</th>
+<td>在重试耗尽或主动结束时作控制决定</td>
+<td>保留失败历史，不把控制决定当成标准确认</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>在插件生成的原生卡里作答。自由文字可用于讨论，但讨论不等于确认；Skip、空答和沉默也不等于同意。卡片不可用时保留待答状态，不能让 Agent 代答。</p>
+</section>
+<section id="read" class="doc-section">
+<p class="eyebrow">08 / 阅读结果</p>
+<h2>先看影响，再查证据。</h2>
+<div class="reading-steps">
+<article>
+<h3>1. 看阻断与未覆盖</h3>
+<p>哪些问题影响结论？哪些规定检查没完成？存在争议，还是确实缺一轮检查？</p>
+</article>
+<article>
+<h3>2. 查标准、原文、来源</h3>
+<p>问题依据是否属于冻结标准？原文定位准确吗？证据究竟支持、反驳，还是中立？</p>
+</article>
+<article>
+<h3>3. 作本轮决定</h3>
+<p>当前影子模式不提供自动推荐结论。接受风险也不把“证据不足”变成“通过”。</p>
+</article>
+</div>
+<div class="table-scroll" role="region" tabindex="0" aria-label="四种检查结果">
+<table>
+<thead>
+<tr>
+<th scope="col">检查结果</th>
+<th scope="col">如何理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">pass</th>
+<td>该项有核验依据支持通过；仍不是你对整份材料的接受。</td>
+</tr>
+<tr>
+<th scope="row">needs changes</th>
+<td>发现需修改的问题，应能回连标准、原文和证据。</td>
+</tr>
+<tr>
+<th scope="row">insufficient evidence</th>
+<td>证据不足以支持判断；保留不确定性，不强凑通过。</td>
+</tr>
+<tr>
+<th scope="row">not applicable</th>
+<td>有明确范围依据的不适用，不是没有检查。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="cost" class="doc-section">
+<p class="eyebrow">09 / 投入与数据</p>
+<h2>预算提前约定，消耗如实记录。</h2>
+<p>评审方案冻结检查分流、联网范围和正数成本上限。运行中不得为了省钱自行少查、扩源或更换模型；达到上限后先暂停，由成本卡承接你的决定。</p>
+<p>
+<code>standard_credits</code> 是按冻结单价表折算的标准消耗量，<strong>不是账单金额、Fast/Ultrafast 实际扣费或订阅使用比例</strong>。未知模型使用保守估算并披露，记录不全会标明未完整计量，不能当作零成本。</p>
+<p>状态和材料快照保存在本地，但模型调用仍由 Codex 宿主处理；“本地插件”不等于“材料从不离开设备”。是否检索外部来源由已确认方案决定。本地快照、来源和轨迹也应按材料本身的敏感程度保管。</p>
+</section>
+<section id="reference" class="doc-section">
+<p class="eyebrow">10 / 操作速查</p>
+<h2>说任务，不必手填工具参数。</h2>
+<div class="table-scroll" role="region" tabindex="0" aria-label="日常操作速查">
+<table>
+<thead>
+<tr>
+<th scope="col">你可以这样说</th>
+<th scope="col">对应行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">“查看 Reviewer 当前状态”</th>
+<td>读取 <code>reviewer_status</code>，确认阶段和未答问题。</td>
+</tr>
+<tr>
+<th scope="row">“继续当前评审”</th>
+<td>同 thread 从保存状态恢复；若等待决定，先处理原问题。</td>
+</tr>
+<tr>
+<th scope="row">“恢复刚才没答的问题”</th>
+<td>核对 ticket 后重呈原题；不挪用其他卡的答复。</td>
+</tr>
+<tr>
+<th scope="row">“这次只对齐标准”</th>
+<td>使用 <code>reviewer-align</code> 的仅对齐模式。</td>
+</tr>
+<tr>
+<th scope="row">“按修改后的文件增量复查”</th>
+<td>使用 <code>reviewer-recheck</code>，重新计算影响范围。</td>
+</tr>
+<tr>
+<th scope="row">“结束这次对齐”</th>
+<td>由对应控制卡记录结束，不代表接受材料。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>开发者：12 个 MCP 工具分别做什么？</summary>
+<p>
+<code>reviewer_start</code> 启动；<code>reviewer_align_submit</code> 提交草案；<code>reviewer_align_build</code> 构建提案；<code>reviewer_assign</code> 派任务；<code>reviewer_collect</code> 从可信宿主收件；<code>reviewer_units_submit</code> 提交单元；<code>reviewer_reconcile</code> 协调；<code>reviewer_finalize</code> 生成最终投影；<code>reviewer_recheck</code> 复查；<code>reviewer_ask</code> 开卡；<code>reviewer_continue</code> 绑定与收集真实回复；<code>reviewer_status</code> 查状态。</p>
+<p>阶段由合法动作驱动，没有供模型随意跳步的公开 advance 工具。工具契约以候选源码为准。</p>
+</details>
+</section>
+<section id="faq" class="doc-section">
+<p class="eyebrow">11 / 常见问题</p>
+<h2>遇到中断或不确定状态时。</h2>
+<details>
+<summary>为什么没有继续检查？</summary>
+<p>先查 status：可能等待标准确认、未答问题、独立审查、成本放行或故障恢复。pending 是有效状态，不应该靠重建评审绕过。</p>
+</details>
+<details>
+<summary>收件出现 result_binding_mismatch 怎么办？</summary>
+<p>结果会被拒收。本候选已将对齐阶段同类错误纳入技术失败；第一次可重派一次，耗尽后按相应控制处理。不要接受错误 ID，也不要修改结果冒充通过。</p>
+</details>
+<details>
+<summary>换了对话，还能继承上次的决定吗？</summary>
+<p>不能。跨 thread 是新评审，不继承旧回执权限；历史标准可作为候选，但仍须核对适用性和必要确认。同 thread 从 status 恢复。</p>
+</details>
+<details>
+<summary>模型判了 pass，为什么还要我决定？</summary>
+<p>pass 是某项检查的结果；材料是否可用于你的决定，还涉及未解问题、范围和风险。影子模式不替你给出最终建议，更不会代你确认。</p>
+</details>
+<details>
+<summary>Claude 和另外两个判官每次都会参与吗？</summary>
+<p>不会。日常运行有独立子任务复核；本版验收才使用可配置模型判官和 Claude 独立核验。允许同一 Codex 家族的不同实际模型，不把不同昵称或 effort 当不同模型。</p>
+</details>
+<details>
+<summary>如何升级或回退？</summary>
+<p>先核对候选 digest 与验收记录，停止旧写入器，再切换包并在新 thread 开始；不要让新旧包同时写同一项目。回退保留新版状态，禁止旧版写入新版状态。当前网站不执行安装更新，日常安装仍是上一份包。</p>
+</details>
+<details>
+<summary>可以给团队直接使用，或用来做合规认证吗？</summary>
+<p>当前 V1 按单用户本地流程设计，未承诺多人协作或其他领域的普遍有效性，也不能替代合规认证。先按当前验证范围使用。</p>
+</details>
+</section>
+</div>
+</div>
+</main>
+<footer class="footer wrap">
+<div>
+<strong>Reviewer</strong>
+<span>先对齐标准，再检查材料，决定留给你。</span>
+</div>
+<div>
+<a href="release.html#sources">内容依据</a>
+<a href="guide.html#faq">常见问题</a>
+<a href="#main">回到顶部 ↑</a>
+</div>
+<p>文档快照 · 2026-10-05 · 首轮适配 Codex · 当前固定影子模式</p>
+</footer>
+<div id="notice" class="notice" role="status" aria-live="polite">
+</div>
+</body>
+</html>
